@@ -19,7 +19,7 @@ const login = async (req, res, next) => {
 
   const { password: userPassword, ...userRes } = user;
 
-  res.status(200).json({ success: true, user: userRes });
+  res.status(200).json({ success: true, user: user });
 };
 
 const getusers = async (req, res, next) => {
