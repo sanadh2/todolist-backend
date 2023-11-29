@@ -1,4 +1,8 @@
-const bcrypt = require("bcryptjs");
-const password = "Sanadh@123";
-const encrptedPw = bcrypt.hashSync(password, 11);
-console.log(encrptedPw);
+const user = {
+  name: "sanadh",
+  email: "hello",
+  password: "pw",
+};
+
+const { password, ...user_ } = user;
+console.log(user_);
