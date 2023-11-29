@@ -3,6 +3,5 @@ const notFound = (req, res, next) => {
     success: false,
     msg: "The route does not exist",
   });
-  next();
 };
 module.exports = notFound;

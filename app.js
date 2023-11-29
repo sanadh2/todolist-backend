@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 require("dotenv").config();
+const cors = require("cors");
 const port = process.env.PORT;
 const connectDB = require("./database");
 const userRoute = require("./Routes/userRoutes");
@@ -13,6 +14,11 @@ app.use(compression());
 app.use(helmet());
 app.use(express.json());
 app.use(morgan("dev"));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.get("/", (req, res) => {
   return res.status(200).send("<h1>Welcome to my server, bitches</h1>");
 });

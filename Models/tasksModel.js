@@ -12,7 +12,7 @@ const taskSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  email: {
+  userID: {
     type: String,
     required: true,
   },

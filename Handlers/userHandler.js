@@ -1,13 +1,12 @@
 const bcrypt = require("bcryptjs");
-const asyncWrapper = require("../Middlewares/async");
 const userModel = require("../Models/userModel");
 const TaskModel = require("../Models/tasksModel");
 
-const getusers = asyncWrapper(async (req, res, next) => {
+const getusers = async (req, res, next) => {
   const users = await userModel.find({});
   res.status(200).json(users);
-});
-const newUser = asyncWrapper(async (req, res, next) => {
+};
+const newUser = async (req, res, next) => {
   const { name, email, password } = req.body;
   const encrptedPw = bcrypt.hashSync(password, 11);
 
@@ -18,14 +17,31 @@ const newUser = asyncWrapper(async (req, res, next) => {
   };
   const user = await userModel.create(new_user);
   res.status(200).json({ success: true, user });
-});
-
-const usersTasks = asyncWrapper(async (req, res, next) => {
+};
+const deleteUser = async (req, res, next) => {
   const { email } = req.body;
-  if (!email) return res.status(400).json({ success: false });
+  const user = await userModel.findOneAndDelete({ email });
+  console.log(user);
+
+  await TaskModel.deleteMany({ email }).then(() => console.log("deleted"));
+  if (user) return res.status(200).json({ success: true, user });
+  return res.status(404).json({ success: false });
+};
+
+const deleteUsers = async (req, res, next) => {
+  const user = await userModel.deleteMany({});
+  await TaskModel.deleteMany({}).then(() => console.log("deletedAll"));
+  if (user) return res.status(200).json({ success: true, user });
+  return res.status(404).json({ success: false });
+};
+
+const usersTasks = async (req, res, next) => {
+  const { email } = req.body;
+  if (!email)
+    return res.status(400).json({ success: false, msg: "Enter the email" });
   const tasks = await TaskModel.find({ email: email });
   res.status(200).json({ success: true, tasks });
   next();
-});
+};
 
-module.exports = { newUser, getusers, usersTasks };
+module.exports = { newUser, getusers, usersTasks, deleteUser, deleteUsers };
