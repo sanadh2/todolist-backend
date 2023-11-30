@@ -9,6 +9,7 @@ const {
   login,
   getUser,
   userVerify,
+  refreshToken,
 } = require("../Handlers/userHandler");
 
 userRoute.post("/new-user", signUp);
@@ -16,6 +17,8 @@ userRoute.post("/new-user", signUp);
 userRoute.post("/login", login);
 
 userRoute.get("/verify", userVerify, getUser);
+
+userRoute.get("/refresh", refreshToken, getUser);
 
 userRoute.get("/user-tasks", usersTasks);
 userRoute.delete("/user-list", deleteUsers);

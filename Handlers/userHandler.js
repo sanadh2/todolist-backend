@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const userModel = require("../Models/userModel");
 const TaskModel = require("../Models/tasksModel");
 const JWT = require("jsonwebtoken");
+
 const login = async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password)
@@ -32,29 +33,59 @@ const login = async (req, res, next) => {
 
 const userVerify = async (req, res, next) => {
   const cookie = req.headers.cookie;
-  const userToken = cookie.split("=")[1];
-  if (!userToken)
+  if (!cookie)
     return res.status(404).json({ success: false, msg: "Invalid Credentials" });
+  const userToken = cookie.split("=")[1];
   JWT.verify(userToken.toString(), process.env.MY_KEY, (err, user) => {
     if (err)
       return res
         .status(404)
         .json({ success: false, msg: "Invalid Credentials" });
-    console.log(user);
 
     req.id = user.id;
   });
+
   next();
 };
 
 const getUser = async (req, res, next) => {
-  const { id } = req.body;
+  const id = req.id;
+  console.log("id", id);
   const user = await userModel.findById(id, "-password");
-  if (!user)
-    return res
-      .status(400)
-      .json({ succes: false, msg: "Could not find the user" });
+  if (!user) {
+    res.status(400).json({ success: false, msg: "Could not find the user" });
+    return res.redirect("/login");
+  }
   res.status(200).json({ success: true, user });
+};
+
+const refreshToken = async (req, res, next) => {
+  const cookie = req.headers.cookie;
+  if (!cookie) {
+    return res.status(400).json({ success: false, msg: "Something Fishy" });
+  }
+  const userToken = cookie.split("=")[1];
+  if (!userToken) {
+    return res.status(400).json({ message: "Something Went Wrong" });
+  }
+  JWT.verify(userToken, process.env.MY_KEY, (err, user) => {
+    if (err)
+      return res
+        .status(400)
+        .json({ success: false, msg: "Authentication Failed" });
+    res.clearCookie(`${user.id}`);
+    const newToken = JWT.sign({ id: user.id }, process.env.MY_KEY, {
+      expiresIn: "2hr",
+    });
+    res.cookie(String(user.id), newToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      expires: new Date(Date.now() + 1000 * 100),
+    });
+    req.id = user.id;
+  });
+  next();
 };
 
 const signUp = async (req, res, next) => {
@@ -104,4 +135,5 @@ module.exports = {
   deleteUser,
   deleteUsers,
   login,
+  refreshToken,
 };
