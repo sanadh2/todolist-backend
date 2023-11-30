@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const userModel = require("../Models/userModel");
 const TaskModel = require("../Models/tasksModel");
-
+const JWT = require("jsonwebtoken");
 const login = async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password)
@@ -13,19 +13,50 @@ const login = async (req, res, next) => {
     return res
       .status(400)
       .json({ success: false, msg: `No user with email ${email}` });
+
   const verify = await bcrypt.compareSync(password, user.password);
   if (!verify)
     return res.status(400).json({ success: false, msg: `Incorrect Password` });
 
-  const { password: userPassword, ...userRes } = user;
-
-  res.status(200).json({ success: true, user: user });
+  const userToken = JWT.sign({ id: user._id }, process.env.MY_KEY, {
+    expiresIn: "2d",
+  });
+  console.log("userToken: ", userToken, "/n");
+  res.cookie(String(user._id), userToken, {
+    sameSite: "lax",
+    httpOnly: true,
+    expires: new Date(Date.now() + 1000 * 300),
+  });
+  res.status(200).json({ success: true });
 };
 
-const getusers = async (req, res, next) => {
-  const users = await userModel.find({});
-  res.status(200).json(users);
+const userVerify = async (req, res, next) => {
+  const cookie = req.headers.cookie;
+  const userToken = cookie.split("=")[1];
+  if (!userToken)
+    return res.status(404).json({ success: false, msg: "Invalid Credentials" });
+  JWT.verify(userToken.toString(), process.env.MY_KEY, (err, user) => {
+    if (err)
+      return res
+        .status(404)
+        .json({ success: false, msg: "Invalid Credentials" });
+    console.log(user);
+
+    req.id = user.id;
+  });
+  next();
 };
+
+const getUser = async (req, res, next) => {
+  const { id } = req.body;
+  const user = await userModel.findById(id, "-password");
+  if (!user)
+    return res
+      .status(400)
+      .json({ succes: false, msg: "Could not find the user" });
+  res.status(200).json({ success: true, user });
+};
+
 const signUp = async (req, res, next) => {
   const { name, email, password } = req.body;
   const encrptedPw = bcrypt.hashSync(password, 11);
@@ -38,6 +69,7 @@ const signUp = async (req, res, next) => {
   const user = await userModel.create(new_user);
   res.status(200).json({ success: true, user });
 };
+
 const deleteUser = async (req, res, next) => {
   const { email } = req.body;
   const user = await userModel.findOneAndDelete({ email });
@@ -65,8 +97,9 @@ const usersTasks = async (req, res, next) => {
 };
 
 module.exports = {
+  userVerify,
+  getUser,
   signUp,
-  getusers,
   usersTasks,
   deleteUser,
   deleteUsers,

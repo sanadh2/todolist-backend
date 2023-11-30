@@ -7,11 +7,16 @@ const {
   deleteUser,
   deleteUsers,
   login,
+  getUser,
+  userVerify,
 } = require("../Handlers/userHandler");
 
-userRoute.get("/user-list", getusers);
 userRoute.post("/new-user", signUp);
+
 userRoute.post("/login", login);
+
+userRoute.get("/verify", userVerify, getUser);
+
 userRoute.get("/user-tasks", usersTasks);
 userRoute.delete("/user-list", deleteUsers);
 userRoute.delete("/user", deleteUser);
