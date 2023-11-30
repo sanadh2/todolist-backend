@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: "http://localhost:1111", // Update this to match your frontend's origin
+    origin: "*", // Update this to match your frontend's origin
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // Set to true if your frontend sends credentials (e.g., cookies)
@@ -24,7 +24,9 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  return res.status(200).send("<h1>Welcome to my server, bitches</h1>");
+  return res
+    .status(200)
+    .send("<h1 style='text-align:center;'>Welcome to my server, bitches</h1>");
 });
 app.use("/user", userRoute);
 app.use("/task", taskRoute);
