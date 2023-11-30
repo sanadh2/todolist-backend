@@ -14,7 +14,14 @@ app.use(compression());
 app.use(helmet());
 app.use(express.json());
 app.use(morgan("dev"));
-app.use(cors());
+const corsOptions = {
+  origin: ["https://todolist-frontend-mine.vercel.app", "*"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.get("/", (req, res) => {
   return res
