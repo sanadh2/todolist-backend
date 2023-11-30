@@ -18,6 +18,7 @@ const corsOptions = {
   origin: [
     "https://todolist-frontend-mine.vercel.app",
     "http://localhost:1111",
+    "http://192.168.1.11:1111",
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
