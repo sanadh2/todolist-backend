@@ -20,7 +20,7 @@ const corsOptions = {
     "http://localhost:1111",
     "http://192.168.1.11:1111",
   ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };

@@ -1,8 +1,2 @@
-const user = {
-  name: "sanadh",
-  email: "hello",
-  password: "pw",
-};
-
-const { password, ...user_ } = user;
-console.log(user_);
+let x = 1;
+console.log(x ? true : false);

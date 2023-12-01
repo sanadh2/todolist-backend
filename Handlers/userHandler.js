@@ -12,12 +12,12 @@ const login = async (req, res, next) => {
   const user = await userModel.findOne({ email });
   if (!user)
     return res
-      .status(400)
+      .status(404)
       .json({ success: false, msg: `No user with email ${email}` });
 
-  const verify = await bcrypt.compareSync(password, user.password);
+  const verify = bcrypt.compareSync(password, user.password);
   if (!verify)
-    return res.status(400).json({ success: false, msg: `Incorrect Password` });
+    return res.status(401).json({ success: false, msg: `Incorrect Password` });
 
   const userToken = JWT.sign({ id: user._id }, process.env.MY_KEY, {
     expiresIn: "2d",
@@ -91,7 +91,15 @@ const refreshToken = async (req, res, next) => {
 const signUp = async (req, res, next) => {
   const { name, email, password } = req.body;
   const encrptedPw = bcrypt.hashSync(password, 11);
-
+  if (!name || !email || !password) {
+    return res.status(400).json({ success: false, msg: "Invalid Credentials" });
+  }
+  const isUserExist = await userModel.findOne({ email });
+  if (isUserExist) {
+    return res
+      .status(401)
+      .json({ success: false, msg: "User Already exists. Try Login " });
+  }
   const new_user = {
     name: name,
     email: email,
@@ -119,12 +127,13 @@ const deleteUsers = async (req, res, next) => {
 };
 
 const usersTasks = async (req, res, next) => {
-  const { email } = req.body;
-  if (!email)
-    return res.status(400).json({ success: false, msg: "Enter the email" });
-  const tasks = await TaskModel.find({ email: email });
-  res.status(200).json({ success: true, tasks });
-  next();
+  const { userID } = req.params;
+  if (!userID)
+    return res
+      .status(400)
+      .json({ success: false, msg: "Did not get enough data" });
+  const tasks = await TaskModel.find({ userID });
+  return res.status(200).json({ success: true, tasks });
 };
 
 module.exports = {

@@ -16,7 +16,6 @@ const newTask = async (req, res, next) => {
   };
   const task = await TaskModel.create(new_task);
   res.status(200).json({ succes: true, task });
-  next();
 };
 
 const updateTask = async (req, res, next) => {
