@@ -30,7 +30,7 @@ app.use(cors(corsOptions));
 app.get("/", (req, res) => {
   return res
     .status(200)
-    .send("<h1 style='text-align:center;'>Welcome to my server, bitches</h1>");
+    .send("<h1 style='text-align:center;'>Welcome to my server</h1>");
 });
 app.use("/user", userRoute);
 app.use("/task", taskRoute);

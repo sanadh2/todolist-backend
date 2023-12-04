@@ -3,10 +3,14 @@ const TaskModel = require("../Models/tasksModel");
 
 const newTask = async (req, res, next) => {
   const { title, completed, userID } = req.body;
+  if (!title || !userID)
+    return res
+      .status(400)
+      .json({ success: false, msg: "Couldn't get enough data" });
   const userValid = await userModel.findById(userID);
   if (userValid.length == 0)
     return res
-      .status(403)
+      .status(404)
       .json({ success: false, msg: `no user with id ${userID}` });
 
   const new_task = {
@@ -34,8 +38,6 @@ const updateTask = async (req, res, next) => {
 
 const deleteTask = async (req, res, next) => {
   const { id } = req.body;
-  console.log(id);
-
   if (!id)
     return res
       .status(403)
@@ -44,4 +46,12 @@ const deleteTask = async (req, res, next) => {
   return res.status(200).json({ success: true, task });
 };
 
-module.exports = { newTask, deleteTask, updateTask };
+const deleteAllTasks = async (req, res, next) => {
+  const { id } = req.body;
+  if (!id)
+    return res.status(400).json({ success: false, msg: "Couldn't get ID" });
+
+  await TaskModel.deleteMany({});
+  return res.status(200).json({ success: true, msg: "All Tasks Deleted" });
+};
+module.exports = { newTask, deleteTask, updateTask, deleteAllTasks };
