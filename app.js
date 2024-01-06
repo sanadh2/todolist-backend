@@ -15,13 +15,7 @@ app.use(helmet());
 app.use(express.json());
 app.use(morgan("dev"));
 const corsOptions = {
-  origin: [
-    "https://todolist-frontend-mine.vercel.app",
-    "http://localhost:1111",
-    "http://192.168.1.11:1111",
-  ],
-  methods: ["GET", "POST", "PATCH", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  origin: "http://localhost:1112",
   credentials: true,
 };
 
