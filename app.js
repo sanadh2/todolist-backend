@@ -21,6 +21,11 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+app.use((req, res, next) => {
+  const ipAddress = req.ip || req.connection.remoteAddress;
+  console.log(`Request from IP address: ${ipAddress}`);
+  next();
+});
 app.get("/", (req, res) => {
   return res
     .status(200)
